@@ -5,6 +5,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 from collections import deque
+import matplotlib.pyplot as plt
 
 
 class Agent:
@@ -48,6 +49,10 @@ class Agent:
         self.memory.append((state, action, reward, next_state, done))
 
     def _learn(self, batch_size):
+        """
+        This function implements the learning and updates the agent's weights and
+        parameters according to past experience.
+        """
         # If the memory is not big enough
         if len(self.memory) < batch_size:
             return
@@ -70,7 +75,7 @@ class Agent:
 
     def _update_epsilon(self):
         """
-        Minimize epsilon as the learning progress
+        Minimize epsilon as the learning progress.
         """
         epsilon_min = 0.01
         epsilon_decay = 0.995
@@ -78,21 +83,36 @@ class Agent:
         if self.epsilon > epsilon_min:
             self.epsilon = self.epsilon * epsilon_decay
 
-    def _save_model(self):
-        self.model.save("CartPole_model_3.h5")
+    def _save_model(self, model_name):
+        self.model.save(model_name)
 
-    def _load_model(self):
-        model = keras.models.load_model("CartPole_model_3.h5")
-        return model
+    @staticmethod
+    def _load_model(model_name):
+        return keras.models.load_model(model_name)
 
-    def train(self, env, train_episodes, batch_size):
+    @staticmethod
+    def plot_learning(rewards):
+        """
+        Plot the rewards over time.
+        """
+        best_ind = np.argmax(rewards)
+        print("Best Score was: {} in Episode: {}".format(rewards[best_ind], best_ind))
+        n_train_episodes = len(rewards)
+        plt.plot(rewards)
+        plt.title("Rewards over time; Average score: " + str(sum(rewards) / n_train_episodes))
+        plt.show()
+
+    def train(self, env, train_episodes, batch_size, model_name):
+        """
+        Train the Agent.
+        """
         rewards = []
         for episode in range(train_episodes):
             state = env.reset()
             state = state.reshape(1, -1)
-
+            # Flag and Counter
             done = False
-            indx = 0
+            score = 0
             while not done:
                 action = self._act(state)
 
@@ -102,21 +122,24 @@ class Agent:
                     reward = -1
                 self._update_memory(state, action, reward, next_state, done)
                 state = next_state
-                indx += 1
-            print("-----------------------------------------------------Episode {}# Score: {}".format(episode, indx + 1))
-            rewards.append(indx)
+                score += 1
+            print("-----------------------------------------------------Episode {}# Score: {}".format(episode, score))
+            rewards.append(score)
             self._learn(batch_size)
         print("Score over time: " + str(sum(rewards) / train_episodes))  # optional
-        self._save_model()
+        self._save_model(model_name)
         return rewards
 
-    def test(self, env, n_test_trials):
-        self.model = self._load_model()
+    def test(self, env, n_test_trials, model_name):
+        """
+        Test the model.
+        """
+        self.model = self._load_model(model_name)
         rewards = []
         for trial in range(n_test_trials):
             state = env.reset()
             state = state.reshape(1, -1)
-            indx = 0
+            score = 0
             done = False
 
             print("****************************************************")
@@ -124,15 +147,15 @@ class Agent:
             while not done:
                 actions = self.model.predict(state)
                 action = np.argmax(actions[0])
-                env.render()
-                # time.sleep(0.05)
+                # env.render()
 
                 next_state, reward, done, _ = env.step(action)
-                indx += 1
+                score += 1
                 if done:
-                    print("-------------------------------------------------Trial {}#, Score: {}".format(trial, indx+1))
+                    print("-------------------------------------------------Trial {}#, Score: {}".format(trial, score))
                 state = next_state.reshape(1, -1)
-            rewards.append(indx)
+            rewards.append(score)
         print("Score over time: " + str(sum(rewards) / n_test_trials))  # optional
         env.close()
+        return rewards
 
