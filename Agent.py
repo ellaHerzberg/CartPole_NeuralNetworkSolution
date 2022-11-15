@@ -126,7 +126,7 @@ class Agent:
             print("-----------------------------------------------------Episode {}# Score: {}".format(episode, score))
             rewards.append(score)
             self._learn(batch_size)
-        print("Score over time: " + str(sum(rewards) / train_episodes))  # optional
+        print("Score over time: " + str(sum(rewards) / train_episodes))
         self._save_model(model_name)
         return rewards
 
@@ -155,7 +155,7 @@ class Agent:
                     print("-------------------------------------------------Trial {}#, Score: {}".format(trial, score))
                 state = next_state.reshape(1, -1)
             rewards.append(score)
-        print("Score over time: " + str(sum(rewards) / n_test_trials))  # optional
+        print("Score over time: " + str(sum(rewards) / n_test_trials))
         env.close()
         return rewards
 

@@ -4,7 +4,6 @@ from Agent import *
 # Configuration parameters
 batch_size = 32
 n_train_episodes = 300
-max_epochs = 100
 n_test_trials = 10
 
 model_name = "CartPole_model.h5"
