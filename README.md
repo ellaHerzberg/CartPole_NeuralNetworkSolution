@@ -1,5 +1,5 @@
 # Cart Pole - A Neural Network Solution
-In this project I solve the CartPole-v1 problem from the "Gym" package using a simple Neural Network implemented with Keras.
+In this project I solve the CartPole-v1 problem from the "Gym" package (version 0.26.2) using a simple Neural Network implemented with Keras.
 
 This program implement a Q-Learning strategies for predicting the best left/right move for the cart, and the goal is to achieve 500 frames before the pole fall down or exit the frame.
 

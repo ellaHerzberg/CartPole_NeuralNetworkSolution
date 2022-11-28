@@ -108,15 +108,15 @@ class Agent:
         """
         rewards = []
         for episode in range(train_episodes):
-            state = env.reset()
+            state = env.reset()[0]
             state = state.reshape(1, -1)
             # Flag and Counter
             done = False
             score = 0
-            while not done:
+            while not done or score < 500:
                 action = self._act(state)
 
-                next_state, reward, done, _ = env.step(action)
+                next_state, reward, done, _, _ = env.step(action)
                 next_state = next_state.reshape(1, -1)
                 if done:
                     reward = -1
@@ -137,19 +137,18 @@ class Agent:
         self.model = self._load_model(model_name)
         rewards = []
         for trial in range(n_test_trials):
-            state = env.reset()
+            state = env.reset()[0]
             state = state.reshape(1, -1)
             score = 0
             done = False
 
             print("****************************************************")
             print("TRIAL ", trial)
-            while not done:
+            while not done or score < 500:
                 actions = self.model.predict(state)
                 action = np.argmax(actions[0])
-                # env.render()
 
-                next_state, reward, done, _ = env.step(action)
+                next_state, reward, done, _, _ = env.step(action)
                 score += 1
                 if done:
                     print("-------------------------------------------------Trial {}#, Score: {}".format(trial, score))

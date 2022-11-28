@@ -9,7 +9,7 @@ n_test_trials = 10
 model_name = "CartPole_model.h5"
 
 # Create environment
-env = gym.make('CartPole-v1')
+env = gym.make('CartPole-v1', render_mode=None)
 
 # Extract parameters
 state_size = env.observation_space.shape[0]
@@ -19,9 +19,10 @@ action_size = env.action_space.n
 agent = Agent(state_size, action_size)
 
 # Train
-# train_rewards = agent.train(env, n_train_episodes, batch_size, model_name)
-# agent.plot_learning(train_rewards)
+train_rewards = agent.train(env, n_train_episodes, batch_size, model_name)
+agent.plot_learning(train_rewards)
 
 # Test
+env = gym.make('CartPole-v1', render_mode="human")
 test_rewards = agent.test(env, n_test_trials, model_name)
 agent.plot_learning(test_rewards)
